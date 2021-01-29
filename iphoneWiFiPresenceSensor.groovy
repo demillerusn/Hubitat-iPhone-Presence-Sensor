@@ -19,7 +19,7 @@
 import groovy.json.*
 	
 metadata {
-	definition (name: "iPhone WiFi Presence Sensor", namespace: "joelwetzel", author: "Joel Wetzel") {
+	definition (name: "iPhone WiFi Presence Sensor", namespace: "heidrickla", author: "Lewis Heidrick") {
 		capability "Refresh"
 		capability "Sensor"
         capability "Presence Sensor"
@@ -27,120 +27,53 @@ metadata {
 
 	preferences {
 		section {
-			input (
-				type: "string",
-				name: "ipAddress",
-				title: "iPhone IP Address",
-				required: true				
-			)
-			input (
-				type: "number",
-				name: "timeoutMinutes",
-				title: "Timeout Minutes",
-				description: "Approximate number of minutes without a response before deciding the device is away/offline.",
-				required: true,
-				defaultValue: 3
-			)
-			input (
-				type: "bool",
-				name: "enableDebugLogging",
-				title: "Enable Debug Logging?",
-				required: true,
-				defaultValue: true
-			)
-            input (
-				type: "bool",
-				name: "enableDevice",
-				title: "Enable Device?",
-				required: true,
-				defaultValue: true
-			)
+			input type: "string", name: "ipAddress", title: "iPhone IP Address", required: true
+			input type: "number", name: "timeoutMinutes", title: "Timeout Minutes", Description: "Approximate number of minutes without a response before deciding the device is away/offline.", required: true, defaultValue: 3
+			input type: "bool", name: "enableDebugLogging", title: "Enable Debug Logging?", required: true, defaultValue: true
+            input type: "bool", name: "enableDevice", title: "Enable Device?", required: true, defaultValue: true
 		}
 	}
 }
 
+def log(msg) {if (enableDebugLogging) {log.debug(msg)}}
 
-def log(msg) {
-	if (enableDebugLogging) {
-		log.debug(msg)	
-	}
-}
-
-
-def installed () {
-	log.info "${device.displayName}.installed()"
-    updated()
-}
-
+def installed () {Updated()}
 
 def updated () {
-	log.info "${device.displayName}.updated()"
-    
     state.tryCount = 0
-    
 	unschedule()
-    
     if (enableDevice) {
         runEvery1Minute(refresh)		// Option 1: test it every minute.  Have a 10 second timeout on the requests.
-        state.triesPerMinute = 1
-
+        state.triesPerMinute = 4
 	//schedule("*/15 * * * * ? *", refresh)    // Option 2: run every 15 seconds, but now we have a 10 second timeout on the requests.
-        //state.triesPerMinute = 4
+    //state.triesPerMinute = 4
     }
-    
     runIn(2, refresh)				// But test it once, right after we install or update it too.
 }
 
-
-def ensureStateVariables() {
-    if (state.triesPerMinute == null) {
-        state.triesPerMinute = 1
-    }
-}
-
+def ensureStateVariables() {if (state.triesPerMinute == null) {state.triesPerMinute = 4}}
 
 def refresh() {
-	log "${device.displayName}.refresh()"
-
 	state.tryCount = state.tryCount + 1
-    
     ensureStateVariables()
-    
     if ((state.tryCount / state.triesPerMinute) > (timeoutMinutes < 1 ? 1 : timeoutMinutes) && device.currentValue('presence') != "not present") {
         def descriptionText = "${device.displayName} is OFFLINE";
         log descriptionText
         sendEvent(name: "presence", value: "not present", linkText: deviceName, descriptionText: descriptionText)
     }
-    
-	if (ipAddress == null || ipAddress.size() == 0) {
-		return
-	}
-	
-	asynchttpGet("httpGetCallback", [
-		uri: "http://${ipAddress}/",
-        timeout: 10
-	]);
+	if (ipAddress == null || ipAddress.size() == 0) {return}
+	asynchttpGet("httpGetCallback", [uri: "http://${ipAddress}/", timeout: 5]);
 }
-
 
 def httpGetCallback(response, data) {
 	log "${device.displayName}: httpGetCallback(${groovy.json.JsonOutput.toJson(response)}, data)"
-	
 	if (response != null && response.status == 408 && response.errorMessage.contains("Connection refused")) {
         log "${device.displayName}: httpGetCallback(The following 'connection refused' result means that the hub was SUCCESSFUL in discovering the phone on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
 		state.tryCount = 0
-		
 		if (device.currentValue('presence') != "present") {
 			def descriptionText = "${device.displayName} is ONLINE";
 			log descriptionText
 			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
 		}
-	}
-    else {
-        log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the phone on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
-
-    }
+	} else {log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the phone on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"}
 }
-
-
-
