@@ -28,10 +28,10 @@ metadata {
 	preferences {
 		section {
 			input type: "string", name: "ipAddress", title: "iPhone IP Address", required: true
-            input type: "number", name: "triesPerMinute", title: "Tries Per Minute", Description: "Test connection ${triesPerMinute} per minute.", required: true, defaultValue: 4, range: "1..4", submitOnChange: true
+            		input type: "number", name: "triesPerMinute", title: "Tries Per Minute", Description: "Test connection ${triesPerMinute} per minute.", required: true, defaultValue: 4, range: "1..4", submitOnChange: true
 			input type: "number", name: "timeoutMinutes", title: "Timeout Minutes", Description: "Approximate number of minutes without a response before deciding the device is away/offline.", required: true, defaultValue: 3
 			input type: "bool", name: "enableDebugLogging", title: "Enable Debug Logging?", required: true, defaultValue: true
-            input type: "bool", name: "enableDevice", title: "Enable Device?", required: true, defaultValue: true
+            		input type: "bool", name: "enableDevice", title: "Enable Device?", required: true, defaultValue: true
 		}
 	}
 }
