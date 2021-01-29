@@ -19,7 +19,7 @@
 import groovy.json.*
 	
 metadata {
-	definition (name: "iPhone WiFi Presence Sensor", namespace: "heidrickla", author: "Lewis Heidrick") {
+	definition (name: "iPhone WiFi Presence Sensor", namespace: "joelwetzel", author: "Joel Wetzel") {
 		capability "Refresh"
 		capability "Sensor"
         capability "Presence Sensor"
@@ -28,6 +28,7 @@ metadata {
 	preferences {
 		section {
 			input type: "string", name: "ipAddress", title: "iPhone IP Address", required: true
+            input type: "number", name: "triesPerMinute", title: "Tries Per Minute", Description: "Test connection ${triesPerMinute} per minute.", required: true, defaultValue: 4, range: "1..4", submitOnChange: true
 			input type: "number", name: "timeoutMinutes", title: "Timeout Minutes", Description: "Approximate number of minutes without a response before deciding the device is away/offline.", required: true, defaultValue: 3
 			input type: "bool", name: "enableDebugLogging", title: "Enable Debug Logging?", required: true, defaultValue: true
             input type: "bool", name: "enableDevice", title: "Enable Device?", required: true, defaultValue: true
@@ -43,26 +44,32 @@ def updated () {
     state.tryCount = 0
 	unschedule()
     if (enableDevice) {
-        runEvery1Minute(refresh)		// Option 1: test it every minute.  Have a 10 second timeout on the requests.
-        state.triesPerMinute = 4
-	//schedule("*/15 * * * * ? *", refresh)    // Option 2: run every 15 seconds, but now we have a 10 second timeout on the requests.
-    //state.triesPerMinute = 4
+        if (triesPerMinute == null) {triesPerMinute = 1}
+        m = 60
+        resultIntDiv = m.intdiv(triesPerMinute)
+        runIn(resultIntDiv, refresh)
     }
     runIn(2, refresh)				// But test it once, right after we install or update it too.
 }
 
-def ensureStateVariables() {if (state.triesPerMinute == null) {state.triesPerMinute = 4}}
+def ensureStateVariables() {if (triesPerMinute == null) {triesPerMinute = 1}}
 
 def refresh() {
-	state.tryCount = state.tryCount + 1
+	state.tryCount = (state.tryCount + 1)
     ensureStateVariables()
-    if ((state.tryCount / state.triesPerMinute) > (timeoutMinutes < 1 ? 1 : timeoutMinutes) && device.currentValue('presence') != "not present") {
+    if (((state.tryCount / triesPerMinute) > (timeoutMinutes < 1 ? 1 : timeoutMinutes)) && (device.currentValue('presence') != "not present")) {
         def descriptionText = "${device.displayName} is OFFLINE";
         log descriptionText
         sendEvent(name: "presence", value: "not present", linkText: deviceName, descriptionText: descriptionText)
     }
 	if (ipAddress == null || ipAddress.size() == 0) {return}
 	asynchttpGet("httpGetCallback", [uri: "http://${ipAddress}/", timeout: 5]);
+    if (enableDevice) {
+        if (triesPerMinute == null) {triesPerMinute = 1}
+        m = 60
+        resultIntDiv = m.intdiv(triesPerMinute)
+        runIn(resultIntDiv, refresh)
+    }
 }
 
 def httpGetCallback(response, data) {
