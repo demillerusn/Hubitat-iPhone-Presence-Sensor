@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.01
+ *  IP Presence Sensor v2.02
  *
  *  Copyright 2019 Joel Wetzel
  *
@@ -16,6 +16,7 @@
  *  v1.01:  Fixed a bug that could happen if a user updated from an older version of the code, but didn't click "Save Preferences".
  *  v2.01:  IP Presence Sensor adapted from iPhone Presence Sensor by Joel Wetzel
  *          Changed tries per minute to tries per hour, changed timeoutMinutes to timeoutTries.  If tries >= timeoutTries, then presence is set to OFFLINE.
+ *  v2.02:  Adds valid presence check for valid HTTP status 200 response.  Presence is validated with either 408 connection refused, or status 200.
  */
 
 import groovy.json.*
@@ -106,6 +107,17 @@ def httpGetCallback(response, data) {
 			log descriptionText
 			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
 		}
+	} else
+    	if (response != null && response.status == 200) {
+        log "${device.displayName}: httpGetCallback(The following 'status 200' result means that the hub was SUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
+		state.tryCount = 0
+		if (device.currentValue('presence') != "present") {
+			def descriptionText = "${device.displayName} is ONLINE";
+			log descriptionText
+			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
+        }
+    } else
 	} else {log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"}
+
 }
 
