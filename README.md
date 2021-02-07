@@ -1,23 +1,16 @@
-# iPhone WiFi Presence Sensor for Hubitat
-A virtual presence sensor for Hubitat that checks if an iPhone is on the WiFi network.
+# IP Presence Sensor for Hubitat
+A virtual presence sensor for Hubitat that checks if an IP device is on the local network.  Adapted from iPhone presence sensor.
 
-Note: iPhones can put their WiFi to sleep, so you should not use this as your only way of detecting presence.  However, it can be used to augment other presence sensors.  Interpret results this way:
-
-- If this sensor shows "present", the iPhone is DEFINITELY present.
-- If this sensor shows "not present", the iPhone may or may not be present.  We don't know.
+- If this sensor shows "present", the device is DEFINITELY present.
+- If this sensor shows "not present", the device may or may not be present.
 
 ## Compatibility
-I only have iPhone devices to test with, but other users have reported it working with the following Android devices.  I cannot provide support for Android myself though.
-- Nexus 5x
-- Pixel XL
-- Pixel 3XL
-- S9
-- Nokia 6
-- Note 9
-- S8+
-
+Tested with local HE LAN device, as long as IP device is present, usually results in a valid check, however recommend checking your device to make sure.
+May or may not work with devices that do not respond to web requests.
 
 ## Installation
+
+Hubitat Package manager file is not updated for recent changes.
 
 The best way to install this code is by using [Hubitat Package Manager](https://community.hubitat.com/t/beta-hubitat-package-manager).
 
