@@ -117,7 +117,7 @@ def httpGetCallback(response, data) {
 			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
         }
     	} else
-    	{log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"}
-
+    	{log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
+	}
 }
 
