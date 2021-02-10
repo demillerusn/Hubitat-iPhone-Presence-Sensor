@@ -7,6 +7,7 @@ A virtual presence sensor for Hubitat that checks if an IP device is on the loca
 ## Compatibility
 Tested with local HE LAN device, as long as IP device is present, usually results in a valid check, however recommend checking your device to make sure.
 May or may not work with devices that do not respond to web requests.
+Original iphone presence sensor checked for HTTP response of 408 and 'Connection refused'.  This keeps that response and also adds a valid HTTP request response of 200.  Both will result in a valid check, anything else results in not present.
 
 ## Installation
 
