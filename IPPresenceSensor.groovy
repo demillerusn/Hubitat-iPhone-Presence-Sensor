@@ -115,8 +115,17 @@ def httpGetCallback(response, data) {
 			def descriptionText = "${device.displayName} is ONLINE";
 			log descriptionText
 			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
-        }
+        	}
     	} else
+	if (response != null && response.status == 401 && response.errorMessage.contains("Unauthorized")) {
+        log "${device.displayName}: httpGetCallback(The following 'Unauthorized' result means that the hub was SUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
+		state.tryCount = 0
+		if (device.currentValue('presence') != "present") {
+			def descriptionText = "${device.displayName} is ONLINE";
+			log descriptionText
+			sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)
+		}
+	} else
     	{log "${device.displayName}: httpGetCallback(The following result means that the hub was UNSUCCESSFUL in discovering the device on the network: ${groovy.json.JsonOutput.toJson(response)}, data)"
 	}
 }
