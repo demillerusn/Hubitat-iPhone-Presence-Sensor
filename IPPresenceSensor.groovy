@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.02
+ *  IP Presence Sensor v2.03
  *
  *  Copyright 2019 Joel Wetzel
  *
@@ -17,6 +17,7 @@
  *  v2.01:  IP Presence Sensor adapted from iPhone Presence Sensor by Joel Wetzel
  *          Changed tries per minute to tries per hour, changed timeoutMinutes to timeoutTries.  If tries >= timeoutTries, then presence is set to OFFLINE.
  *  v2.02:  Adds valid presence check for valid HTTP status 200 response.  Presence is validated with either 408 connection refused, or status 200.
+ *  v2.03:  Adds valid presence check for HTTP status 401 response and "Unauthorized".
  */
 
 import groovy.json.*
