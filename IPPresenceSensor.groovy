@@ -57,7 +57,7 @@ metadata {
 	input	type: “number”,
 		name: “reconnectRate”,
 		title: “Reconnect Check Rate in seconds”,
-		Description: “Number of seconds between tries when device is disconnected.”
+		Description: “Number of seconds between tries when device is disconnected.”,
 		Required: true,
 		defaultValue: 60,
 		range: “10..${3600.intdiv(triesPerHour)}”,
