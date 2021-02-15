@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.12
+ *  IP Presence Sensor v2.13
  *
  *  Copyright 2019 Joel Wetzel
  *
@@ -25,9 +25,9 @@
  *	Streamlines logging to either the hub was discovered or the hub was not discovered.
  *  v2.11:  Corrected numerous syntax errors.
  *  v2.12:  Corrected final syntax errors.
+ *  v2.13:  Added reconnectRate to ensureStateVariables. T/S Event handler not setting device to discovered.
  *	    
  */
-
 import groovy.json.*
 	
 metadata {
@@ -92,7 +92,8 @@ def updated ()
 	runIn(2, refresh)			// But test it once, right after we install or update it too.
 	}
 
-def ensureStateVariables() {if (triesPerHour == null) {triesPerHour = 12}}
+def ensureStateVariables() {if (triesPerHour == null) {triesPerHour = 12}
+			    if (reconnectRate == null) {reconnectRate = 60}}
 
 def refresh()
 	{state.tryCount = (state.tryCount + 1)
@@ -120,7 +121,7 @@ def httpGetCallback(response, data)
 	if (response != null && response.status == 408 && response.errorMessage.contains("Connection refused") ||
 	response != null && response.status == 200 ||
 	response != null && response.status == 401 && response.errorMessage.contains("Unauthorized"))
-		{log "${device.displayName}: httpGetCallback(The network device was DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"
+	 {log "${device.displayName} is ${device.currentValue}: httpGetCallback(The network device was DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"
 		state.tryCount = 0}
 	 else
     		{log "${device.displayName}: httpGetCallback(The network device was NOT DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"}
