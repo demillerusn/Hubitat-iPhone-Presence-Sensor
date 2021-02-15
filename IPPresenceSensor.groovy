@@ -99,7 +99,7 @@ def ensureStateVariables() {if (triesPerHour == null) {triesPerHour = 12}
 def refresh()
 	{state.tryCount = (state.tryCount + 1)
 	ensureStateVariables()
-	if ((state.tryCount = 1) && (device.currentValue('presence') != "present"))
+	if ((state.tryCount == 1) && (device.currentValue('presence') != "present"))
 		{def descriptionText = "${device.displayName} is ONLINE";
 		log descriptionText
 		sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)}
