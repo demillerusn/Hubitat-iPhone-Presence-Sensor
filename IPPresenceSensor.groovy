@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.11
+ *  IP Presence Sensor v2.12
  *
  *  Copyright 2019 Joel Wetzel
  *
@@ -23,7 +23,8 @@
  *	Consolidates HTTP checks into single conditional IF vice sequential IF... ELSE statements.
  *	Adds additional parameter for refresh rate (in seconds) when device is offline for increased check frequency.
  *	Streamlines logging to either the hub was discovered or the hub was not discovered.
- *  v2.11:  Corrected numerous syntax errors, recommit to correct version number at top.
+ *  v2.11:  Corrected numerous syntax errors.
+ *  v2.12:  Corrected final syntax errors.
  *	    
  */
 
@@ -61,7 +62,7 @@ metadata {
 		Description: "Number of seconds between tries when a device is disconnected.",
 		required: true,
 		defaultValue: 60,
-		range: "10..${3600.intdiv(triesPerHour)}"
+		range: "10..3600"
 		submitOnChange: true
 	input 	type: "bool",
                 name: "enableDebugLogging",
@@ -88,7 +89,8 @@ def updated ()
         	m = 3600
         	resultIntDiv = m.intdiv(triesPerHour)
         	runIn(resultIntDiv, refresh)}
-	runIn(2, refresh)			// But test it once, right after we install or update it too.}
+	runIn(2, refresh)			// But test it once, right after we install or update it too.
+	}
 
 def ensureStateVariables() {if (triesPerHour == null) {triesPerHour = 12}}
 
@@ -119,8 +121,8 @@ def httpGetCallback(response, data)
 	response != null && response.status == 200 ||
 	response != null && response.status == 401 && response.errorMessage.contains("Unauthorized"))
 		{log "${device.displayName}: httpGetCallback(The network device was DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"
-		state.tryCount = 0
-	} else
+		state.tryCount = 0}
+	 else
     		{log "${device.displayName}: httpGetCallback(The network device was NOT DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"}
 	}
 
