@@ -23,6 +23,7 @@
  *	Consolidates HTTP checks into single conditional IF vice sequential IF... ELSE statements.
  *	Adds additional parameter for refresh rate (in seconds) when device is offline for increased check frequency.
  *	Streamlines logging to either the hub was discovered or the hub was not discovered.
+ *  v2.11:  Corrected numerous syntax errors.
  *	    
  */
 
@@ -60,7 +61,7 @@ metadata {
 		Description: "Number of seconds between tries when a device is disconnected.",
 		required: true,
 		defaultValue: 60,
-		range: "10..${3600.intdiv(triesPerHour)}”,
+		range: "10..${3600.intdiv(triesPerHour)}"
 		submitOnChange: true
 	input 	type: "bool",
                 name: "enableDebugLogging",
@@ -100,7 +101,7 @@ def refresh()
 		sendEvent(name: "presence", value: "not present", linkText: deviceName, descriptionText: descriptionText)}
 	if (ipAddress == null || ipAddress.size() == 0) {return}
 	asynchttpGet("httpGetCallback", [uri: "http://${ipAddress}/", timeout: 5]);
-	if ((state.tryCount = 0) && (device.currentValue('presence') != "present")
+	if ((state.tryCount = 0) && (device.currentValue('presence') != "present"))
 		{def descriptionText = "${device.displayName} is ONLINE";
 		log descriptionText
 		sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)}
