@@ -23,7 +23,7 @@
  *	Consolidates HTTP checks into single conditional IF vice sequential IF... ELSE statements.
  *	Adds additional parameter for refresh rate (in seconds) when device is offline for increased check frequency.
  *	Streamlines logging to either the hub was discovered or the hub was not discovered.
- *  v2.11:  Corrected numerous syntax errors.
+ *  v2.11:  Corrected numerous syntax errors, recommit to correct version number at top.
  *	    
  */
 
