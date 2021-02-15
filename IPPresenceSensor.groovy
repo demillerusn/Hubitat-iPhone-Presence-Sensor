@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.1
+ *  IP Presence Sensor v2.11
  *
  *  Copyright 2019 Joel Wetzel
  *
