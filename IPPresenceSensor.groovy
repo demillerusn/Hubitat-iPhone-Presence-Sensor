@@ -1,5 +1,5 @@
 /**
- *  IP Presence Sensor v2.13
+ *  IP Presence Sensor v2.14
  *
  *  Copyright 2019 Joel Wetzel
  *
@@ -26,6 +26,7 @@
  *  v2.11:  Corrected numerous syntax errors.
  *  v2.12:  Corrected final syntax errors.
  *  v2.13:  Added reconnectRate to ensureStateVariables. T/S Event handler not setting device to discovered.
+ *  v2.14:  Corrected flow error in refresh event handler which prevented sending 'present' event when device was discovered.
  *	    
  */
 import groovy.json.*
@@ -98,16 +99,19 @@ def ensureStateVariables() {if (triesPerHour == null) {triesPerHour = 12}
 def refresh()
 	{state.tryCount = (state.tryCount + 1)
 	ensureStateVariables()
-	if ((state.tryCount >= timeoutTries) && (device.currentValue('presence') != "not present"))
-		{def descriptionText = "${device.displayName} is OFFLINE";
-		log descriptionText
-		sendEvent(name: "presence", value: "not present", linkText: deviceName, descriptionText: descriptionText)}
-	if (ipAddress == null || ipAddress.size() == 0) {return}
-	asynchttpGet("httpGetCallback", [uri: "http://${ipAddress}/", timeout: 5]);
-	if ((state.tryCount = 0) && (device.currentValue('presence') != "present"))
+	if ((state.tryCount = 1) && (device.currentValue('presence') != "present"))
 		{def descriptionText = "${device.displayName} is ONLINE";
 		log descriptionText
 		sendEvent(name: "presence", value: "present", linkText: deviceName, descriptionText: descriptionText)}
+	else
+	{if ((state.tryCount >= timeoutTries) && (device.currentValue('presence') != "not present"))
+		{def descriptionText = "${device.displayName} is OFFLINE";
+		log descriptionText
+		sendEvent(name: "presence", value: "not present", linkText: deviceName, descriptionText: descriptionText)}
+	}
+	if (ipAddress == null || ipAddress.size() == 0) {return}
+	asynchttpGet("httpGetCallback", [uri: "http://${ipAddress}/", timeout: 5]);
+
 	if (enableDevice)
 		{if (triesPerHour == null) {triesPerHour = 12}
 		m = 3600
