@@ -128,6 +128,6 @@ def httpGetCallback(response, data)
 	 {log "${device.displayName} is ${device.currentValue}: httpGetCallback(The network device was DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"
 		state.tryCount = 0}
 	 else
-    		{log "${device.displayName}: httpGetCallback(The network device was NOT DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"}
+    	{log "${device.displayName}: httpGetCallback(The network device was NOT DISCOVERED: ${groovy.json.JsonOutput.toJson(response)}, data)"}
 	}
 
